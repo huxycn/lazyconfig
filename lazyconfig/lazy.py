@@ -45,7 +45,7 @@ class LazyCall:
             )
         self._target = target
 
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         if is_dataclass(self._target):
             # omegaconf object cannot hold dataclass type
             # https://github.com/omry/omegaconf/issues/784
@@ -53,6 +53,10 @@ class LazyCall:
         else:
             target = self._target
         kwargs["_target_"] = target
+
+        if len(args) > 0:
+            for i, arg in enumerate(args):
+                kwargs[i] = arg
 
         return DictConfig(content=kwargs, flags={"allow_objects": True})
 

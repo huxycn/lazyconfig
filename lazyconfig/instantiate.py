@@ -74,7 +74,11 @@ def instantiate(cfg):
                 cls_name = str(cls)
         assert callable(cls), f"_target_ {cls} does not define a callable object"
         try:
-            return cls(**cfg)
+            positions = [k for k in cfg.keys() if isinstance(k, int)]
+            positions.sort()
+            args = [cfg[k] for k in positions]
+            kwargs = {k: cfg[k] for k in cfg.keys() if k not in positions}
+            return cls(*args, **kwargs)
         except TypeError:
             logger = logging.getLogger(__name__)
             logger.error(f"Error when instantiating {cls_name}!")
