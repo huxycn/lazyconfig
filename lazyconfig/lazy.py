@@ -15,8 +15,8 @@ import cloudpickle
 import yaml
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from lazyconfig.utils.file_io import PathManager
-from lazyconfig.utils.registry import _convert_target_to_string
+# from lazyconfig.utils.file_io import PathManager
+from .utils import _convert_target_to_string
 
 __all__ = ["LazyCall", "LazyConfig"]
 
@@ -72,7 +72,7 @@ def _visit_dict_config(cfg, func):
 
 def _validate_py_syntax(filename):
     # see also https://github.com/open-mmlab/mmcv/blob/master/mmcv/utils/config.py
-    with PathManager.open(filename, "r") as f:
+    with open(filename, "r") as f:
         content = f.read()
     try:
         ast.parse(content)
@@ -122,7 +122,7 @@ def _patch_import():
         # be discussed further if needed.
         if not cur_file.endswith(".py"):
             cur_file += ".py"
-        if not PathManager.isfile(cur_file):
+        if not os.path.isfile(cur_file):
             raise ImportError(
                 f"Cannot import name {relative_import_path} from "
                 f"{original_file}: {cur_file} has to exist."
@@ -143,7 +143,7 @@ def _patch_import():
             )
             module = importlib.util.module_from_spec(spec)
             module.__file__ = cur_file
-            with PathManager.open(cur_file) as f:
+            with open(cur_file) as f:
                 content = f.read()
             exec(compile(content, cur_file, "exec"), module.__dict__)
             for name in fromlist:  # turn imported dict into DictConfig automatically
@@ -202,7 +202,7 @@ class LazyConfig:
                     "__file__": filename,
                     "__package__": _random_package_name(filename),
                 }
-                with PathManager.open(filename) as f:
+                with open(filename) as f:
                     content = f.read()
                 # Compile first with filename to:
                 # 1. make filename appears in stacktrace
@@ -211,7 +211,7 @@ class LazyConfig:
 
             ret = module_namespace
         else:
-            with PathManager.open(filename) as f:
+            with open(filename) as f:
                 obj = yaml.unsafe_load(f)
             ret = OmegaConf.create(obj, flags={"allow_objects": True})
 
@@ -267,7 +267,7 @@ class LazyConfig:
         try:
             dict = OmegaConf.to_container(cfg, resolve=False)
             dumped = yaml.dump(dict, default_flow_style=None, allow_unicode=True, width=9999)
-            with PathManager.open(filename, "w") as f:
+            with open(filename, "w") as f:
                 f.write(dumped)
 
             try:
@@ -286,7 +286,7 @@ class LazyConfig:
             new_filename = filename + ".pkl"
             try:
                 # retry by pickle
-                with PathManager.open(new_filename, "wb") as f:
+                with open(new_filename, "wb") as f:
                     cloudpickle.dump(cfg, f)
                 logger.warning(f"Config is saved using cloudpickle at {new_filename}.")
             except Exception:

@@ -4,7 +4,7 @@ import logging
 from collections import abc
 from typing import Any
 
-from lazyconfig.utils.registry import _convert_target_to_string, locate
+from .utils import _convert_target_to_string, locate
 
 __all__ = ["dump_dataclass", "instantiate"]
 

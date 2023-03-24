@@ -1,7 +1,10 @@
-from .config import LazyCall, LazyConfig, instantiate
+# Copyright (c) Facebook, Inc. and its affiliates.
+from .lazy import LazyCall, LazyConfig
+from .instantiate import instantiate
+
 
 __all__ = [
-    "instantiate",
     "LazyCall",
     "LazyConfig",
+    "instantiate",
 ]

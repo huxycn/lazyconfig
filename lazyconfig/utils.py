@@ -2,14 +2,13 @@
 
 from typing import Any
 import pydoc
-from fvcore.common.registry import Registry  # for backward compatibility.
 
 """
 ``Registry`` and `locate` provide ways to map a string (typically found
 in config files) to callable objects.
 """
 
-__all__ = ["Registry", "locate"]
+__all__ = ["_convert_target_to_string", "locate"]
 
 
 def _convert_target_to_string(t: Any) -> str:
